@@ -43,11 +43,11 @@ anything. Its service is already running; repository setup does not require a re
 Android (Room) / iOS (SwiftData)
              | HTTP /api/chat, newline-delimited JSON
              v
-Python control service :11434
+Python control service :11434 (or any other port of your choice)
   session leases, bounded caches, compaction, /api/status, /metrics
              | loopback only
              v
-llama-server 127.0.0.1:18080
+llama-server 127.0.0.1:18080 (or any other port of your choice)
   Muse Glimmer GGUF + vision projector, four 8K slots
 ```
 
