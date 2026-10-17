@@ -1,6 +1,6 @@
 # Local runtime dashboard
 
-Open **http://127.0.0.1:11436/** on the Mac that runs Muse Glimmer. The page refreshes every
+Open **http://127.0.0.1:11436/** (or any other port if you may have changed) on the Mac that runs Muse Glimmer. The page refreshes every
 two seconds and remains available after the worker or terminal exits. It is deliberately
 not accessible from a phone or another computer.
 
