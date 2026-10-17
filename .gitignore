@@ -1,0 +1,59 @@
+# Local agent coordination and private conversations
+/.orcha/
+/.claude/
+/.codex/
+/.agents/
+# Credentials, machine configuration and signing
+.env
+.env.*
+!.env.example
+local.properties
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.mobileprovision
+*.provisionprofile
+*.xcuserstate
+xcuserdata/
+*.xcconfig.local
+# Runtime weights, caches, logs, databases and generated artifacts
+models/
+*.gguf
+*.safetensors
+*.onnx
+*.pt
+*.pth
+*.log
+*.db
+*.db-*
+*.sqlite*
+state/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.gradle/
+.idea/
+*.iml
+node_modules/
+build/
+build-*/
+DerivedData/
+dist/
+*.apk
+*.aab
+*.ipa
+*.xcarchive/
+*.xcresult/
+*.dSYM/
+.cxx/
+.externalNativeBuild/
+.DS_Store
+# Legacy host-specific launchd registration; new registrations are generated in state/.
+/muse-runtime/scripts/local.muse-glimmer.runtime.plist
+# Original icon backup is not a build input.
+/QChat-iOS/tools/AppIcon-original-backup.png

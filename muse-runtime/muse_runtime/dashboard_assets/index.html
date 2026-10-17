@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Muse Glimmer • Local monitor</title>
+  <link rel="stylesheet" href="/dashboard.css"><script defer src="/dashboard.js"></script>
+</head>
+<body>
+<header><div><p class="wordmark">QChat / Muse Glimmer</p><h1>Local runtime monitor</h1><p class="intro">A live view of this Mac and its conversation caches.</p></div><div class="connection"><span id="connection" class="badge">Connecting</span><p id="updated">Waiting for the first sample</p><button id="refresh" type="button">Refresh now</button></div></header>
+<main>
+  <div id="notice" class="notice" role="status">Connecting to the local monitor…</div>
+  <section aria-labelledby="controls-title" class="controls">
+    <h2 id="controls-title">Dashboard controls</h2>
+    <div class="control-grid">
+      <article><h3>Start a fresh observation window</h3><p>Clear retained events, charts and displayed totals. Chats, leases, caches, model and limits stay unchanged.</p><button id="reset-data" type="button">Reset dashboard data</button><p id="observation-window" class="caption">Waiting for observation window</p></article>
+      <article><h3>Clear a conversation cache</h3><p>Phone history is preserved; the next chat rebuilds its context. Active requests must finish first. Heartbeats can renew a lease, but cannot rebuild its cache.</p><label>Eviction target <select id="cache-target"><option value="">Choose a target…</option><option value="all">All caches</option></select></label> <button id="evict-cache" type="button">Force evict KV cache</button><p class="caption">Erasure frees logical cache capacity. It does not guarantee memory returns to macOS.</p>
+      <details id="recovery"><summary>Stuck backend or need to release model memory?</summary><p>Unload and pause stops the supervised inference process, interrupts <strong>all chats</strong> and unloads model weights as well as caches. Phone history stays intact. The model stays paused, including after a service restart, until you explicitly reload it here.</p><label><input id="interrupt-confirm" type="checkbox"> I understand this interrupts all chats and requires a reload.</label><div class="recovery-actions"><button id="unload-model" type="button">Unload model and pause chats</button><button id="reload-model" type="button">Reload model</button></div></details></article>
+    </div>
+    <p id="control-result" role="status" aria-live="polite">No control run yet.</p><p id="control-memory" class="caption">Before/after measurements will appear here. Host RAM includes other apps; process RSS does not isolate KV or Apple GPU allocations.</p>
+  </section>
+  <section aria-labelledby="resources-title">
+    <div class="section-head"><h2 id="resources-title">This Mac</h2><span>Samples every 2 seconds</span></div>
+    <div class="resources">
+      <article><h3>RAM in use</h3><p class="metric" id="ram">Unavailable</p><meter id="ram-meter" min="0" max="100" value="0" aria-label="Host RAM percentage"></meter><p id="ram-detail">Waiting for host measurements</p><svg id="ram-chart" viewBox="0 0 400 48" role="img" aria-label="Recent host RAM usage"><path></path></svg><p class="caption">Total minus available memory. Includes the whole Mac.</p></article>
+      <article><h3>CPU activity</h3><p class="metric" id="cpu">Unavailable</p><meter id="cpu-meter" min="0" max="100" value="0" aria-label="Host CPU percentage"></meter><p id="cpu-detail">100% = all logical CPUs fully busy</p><svg id="cpu-chart" viewBox="0 0 400 48" role="img" aria-label="Recent host CPU activity"><path></path></svg><p class="caption">The charts retain the latest 3 minutes of samples.</p></article>
+      <article class="processes"><h3>Process use</h3><table><thead><tr><th>Process</th><th>RAM (RSS)</th><th>CPU</th></tr></thead><tbody id="processes"></tbody></table><p class="caption">Process CPU: 100% = one logical CPU. RSS is resident RAM; it does not isolate GPU or cache allocations.</p></article>
+    </div>
+  </section>
+  <section aria-labelledby="sessions-title">
+    <div class="section-head"><h2 id="sessions-title">Conversation leases</h2><span id="slots">Waiting for runtime</span></div>
+    <p class="help">A lease protects an idle conversation until its time runs out. A reply in progress is protected; cache pressure can still evict an idle cache before its lease ends.</p>
+    <div id="sessions" class="sessions"><p class="empty">No runtime sample yet.</p></div>
+    <p id="sessions-note" class="caption"></p>
+  </section>
+  <section aria-labelledby="limits-title">
+    <div class="section-head"><h2 id="limits-title">Limits, separately</h2><span id="model-status">Backend readiness unavailable</span></div>
+    <div id="limits" class="limits"></div>
+    <div id="activity" class="activity"></div>
+  </section>
+  <section aria-labelledby="events-title">
+    <div class="section-head"><h2 id="events-title">Renewals &amp; runtime events</h2><div class="filters"><label>Show <select id="event-kind"><option value="all">All events</option><option value="lease_renewed">Lease renewals</option><option value="cache">Cache changes</option><option value="errors">Errors</option></select></label><label>Conversation <select id="event-session"><option value="all">All conversations</option></select></label></div></div>
+    <p id="history-note" class="help">Event history becomes available when runtime telemetry is connected.</p>
+    <div class="event-scroll" tabindex="0" aria-label="Timestamped runtime event history"><table class="events"><thead><tr><th>Time</th><th>Conversation</th><th>Event</th><th>Detail</th></tr></thead><tbody id="events"></tbody></table></div>
+  </section>
+</main>
+<footer><p>Automatic monitoring never sends a chat, renews a lease, or loads the model. Only the explicit controls change runtime state.</p><p id="footer-detail">Only available on this Mac. Conversation text and original session IDs are excluded.</p></footer>
+</body>
+</html>

@@ -1,0 +1,2 @@
+# Only the separate localhost dashboard needs this. Runtime inference remains stdlib-only.
+psutil>=5.9,<8
