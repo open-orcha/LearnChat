@@ -1,23 +1,31 @@
-# Set up the Mac runtime
+# Set up the Mac runtime without Ollama
+
+This is the direct-download path for running Muse Glimmer from Meta's official Hugging Face
+repository. LearnChat starts the GGUF files with standalone llama.cpp and its own Python service;
+this path does not require or invoke Ollama. Clone this repository first as described in the main
+[README](../README.md#start-here), then complete the steps below on the Mac that will run the
+model.
 
 ## Prerequisites
 
 The supported deployment is macOS on Apple silicon, with Python 3.9 or newer, zsh,
-`curl`, `lsof`, and standalone `llama-server`. Python uses only its standard library;
-there is no pip dependency installation for the inference service. The optional localhost
-[resource and lease dashboard](runtime-dashboard.md) uses psutil in a separate process. The current host uses Python 3.9.7,
-llama.cpp 0.7.0 (build 11669) and a 128 GB Apple M5 Max Mac. Other platforms have not
-been validated; the supplied start/stop scripts use macOS launchd.
+`curl`, `lsof`, and standalone `llama-server`. The LearnChat runtime is the checked-in
+`muse-runtime/` directory; it does not require a separate package install. Python uses only its
+standard library; there is no pip dependency installation for the inference service. The optional
+localhost [resource and lease dashboard](runtime-dashboard.md) uses psutil in a separate process.
+The current host uses Python 3.9.7, llama.cpp 0.7.0 (build 11669) and a 128 GB Apple M5 Max Mac.
 
 Allow at least 20 GB for the model and projector plus room for downloads, tools and caches.
 The existing model process measured about 18 GiB resident memory before workload-dependent
 headroom. A 32 GB or larger Mac is a practical starting point, not a tested minimum.
 
-Install command-line tools and Homebrew if they are missing, following their official setup
-instructions. Then install the backend:
+Install Apple's Command Line Tools and Homebrew if they are missing, following their official
+setup instructions. An existing Python 3.9 or newer is sufficient; otherwise Homebrew can install
+Python alongside the backend:
 
 ```sh
-brew install llama.cpp
+brew install python llama.cpp
+python3 --version
 llama-server --version
 ```
 
@@ -38,12 +46,24 @@ requires `/v1/chat/completions/input_tokens`, explicit `id_slot`, the slot APIs 
 an arbitrary older llama.cpp build is not sufficient. Keep a known working backend when
 upgrading rather than updating the live service during phone testing.
 
-## Obtain the model and projector
+The current `run.sh`, `start.sh`, `status.sh`, and `stop.sh` scripts target macOS. Windows and
+Linux need additional service-launch and shell-script work; the commands in this guide are not a
+validated setup path for those systems.
+
+## Download Muse Glimmer directly from Meta
 
 Download the Q4_K_M text weights and matching perception encoder from
 [Meta's Muse Glimmer GGUF repository](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF).
 The model card identifies the two files below and requires llama.cpp build 10353 or later.
 Read its model terms before use; no weights are distributed in LearnChat.
+
+| Required download | Exact size | Official Meta source |
+| --- | ---: | --- |
+| `Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf` | 16,756,683,904 bytes (16.8 GB) | [Model file](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF/blob/70bf1b61ac09f91b24d39038091b41c582bc5d7a/Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf) |
+| `mmproj-Muse-Glimmer-30B-Q4_K_M.gguf` | 1,400,328,928 bytes (1.4 GB) | [Image-support file](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF/blob/70bf1b61ac09f91b24d39038091b41c582bc5d7a/mmproj-Muse-Glimmer-30B-Q4_K_M.gguf) |
+
+Both files are required by the checked-in runtime command. Store them together under
+`~/Models/muse-glimmer/`:
 
 ```sh
 mkdir -p "$HOME/Models/muse-glimmer"
@@ -55,26 +75,44 @@ curl --fail --location --retry 3 \
   --output "$HOME/Models/muse-glimmer/mmproj-Muse-Glimmer-30B-Q4_K_M.gguf"
 ```
 
-These URLs pin the upstream revision inspected on 2026-10-17. Verify the downloaded files
-with `shasum -a 256`; expected hashes from upstream file metadata are:
+These URLs pin the upstream revision inspected on 2026-10-17. Verify both file sizes and
+checksums after downloading:
+
+```sh
+cd "$HOME/Models/muse-glimmer"
+stat -f '%N: %z bytes' \
+  Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf \
+  mmproj-Muse-Glimmer-30B-Q4_K_M.gguf
+shasum -a 256 \
+  Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf \
+  mmproj-Muse-Glimmer-30B-Q4_K_M.gguf
+```
+
+Expected hashes from upstream file metadata are:
 
 ```text
 4cc57c0f51040a226e5a72cc47b7613f7772950e460a665f7083de89f183f60e  Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf
 f48b452316f9b213758e8659444029b961a24a07f99a1abb2a9f88b06f7c00c6  mmproj-Muse-Glimmer-30B-Q4_K_M.gguf
 ```
 
-A login/error page is not a GGUF. The pinned model is 16756683904 bytes and differs from
-the older installed model below; it has not been re-downloaded or live-tested in this migration.
-The current host reuses already-downloaded Ollama blobs without copying or modifying them:
+A login/error page is not a GGUF. This direct-download procedure was checked against Meta's
+current repository and LearnChat's configuration, but the full fresh setup has not been run
+end to end on a second laptop.
+
+### Existing installations that already have the files
+
+The current development Mac predates the direct-download procedure and reuses already-downloaded
+Ollama blobs without running Ollama. Its older text-model blob differs from the current pinned
+Meta file:
 
 | File | Size (bytes) | SHA-256 from the existing content-addressed manifest |
 | --- | ---: | --- |
 | Q4_K_M model | 16756681056 | `71b5c9c9abbc2a9e7c13550b6f9fe1f062650117a24490b15a310cbd7de03f8b` |
 | Vision projector | 1400328928 | `f48b452316f9b213758e8659444029b961a24a07f99a1abb2a9f88b06f7c00c6` |
 
-Those files live under `~/.ollama/models/blobs/sha256-<hash>` on the existing host.
-Reuse them by setting the two paths below; do not delete that directory while the service
-uses it. New downloads may differ from this historical manifest. No Ollama process is needed.
+Those files live under `~/.ollama/models/blobs/sha256-<hash>` on that existing host. This is a
+historical compatibility note, not a step in the fresh setup above. A new installation should
+use the two files in `~/Models/muse-glimmer/`; no Ollama process or directory is needed.
 
 ## Configure
 
@@ -86,11 +124,44 @@ cd muse-runtime
 cp -n config.example.env .env
 ```
 
-Edit `.env`. It is a shell-sourced local file, so quote paths containing spaces.
-Set `MUSE_MODEL_PATH` and `MUSE_MMPROJ_PATH` to the two real GGUF files, and
-`MUSE_LLAMA_SERVER` to `command -v llama-server` (or your source-build path).
-The example uses `$HOME/Models/muse-glimmer`. Set `MUSE_PYTHON` to an absolute interpreter
-path if needed. Do not commit this file or paste API keys into task threads.
+Edit `.env`. It is a shell-sourced local file, so quote paths containing spaces. The complete
+checked-in direct-download configuration is:
+
+```dotenv
+MUSE_HOST=127.0.0.1
+MUSE_PORT=11434
+
+MUSE_BACKEND_HOST=127.0.0.1
+MUSE_BACKEND_PORT=18080
+MUSE_LLAMA_SERVER=/opt/homebrew/bin/llama-server
+# MUSE_PYTHON=/opt/homebrew/bin/python3
+
+MUSE_MODEL_PATH="$HOME/Models/muse-glimmer/Muse-Glimmer-30B-KQuant-17GB-Q4_K_M.gguf"
+MUSE_MMPROJ_PATH="$HOME/Models/muse-glimmer/mmproj-Muse-Glimmer-30B-Q4_K_M.gguf"
+MUSE_MODEL_NAME=muse-glimmer:latest
+
+MUSE_SLOTS=4
+MUSE_CONTEXT_SIZE=32768
+MUSE_SESSION_TOKEN_LIMIT=8192
+MUSE_TOTAL_CACHE_TOKEN_LIMIT=24576
+MUSE_MAX_OUTPUT_TOKENS=2048
+MUSE_LEASE_SECONDS=300
+
+MUSE_SNAPSHOT_MODE=disabled
+
+MUSE_MODEL_UNLOAD_POLICY=keep_loaded
+MUSE_MODEL_IDLE_SECONDS=900
+MUSE_BACKEND_AUTOSTART=true
+
+MUSE_API_KEY=
+MUSE_LOG_LEVEL=INFO
+```
+
+On a standard Apple silicon Homebrew installation, `command -v llama-server` prints the path
+shown above. If yours prints a different path, use that absolute path for `MUSE_LLAMA_SERVER`.
+For a source build, use its resulting executable instead. If `python3` is not the intended
+Python 3.9+ interpreter, add `MUSE_PYTHON=/absolute/path/to/python3`. Do not commit `.env` or
+paste API keys into task threads.
 
 | Setting | Default / intended behavior |
 | --- | --- |
@@ -111,6 +182,22 @@ path if needed. Do not commit this file or paste API keys into task threads.
 `idle_timeout` and `immediate` weight-unload modes also exist. Do not change the established
 `keep_loaded` policy for the Android cache test. Default state is `muse-runtime/state/`;
 `MUSE_STATE_DIR` can change backend/cache state, but launchd console logs remain in local `state/`.
+
+The 16.8 GB model still has to fit in memory. On a lower-powered Mac, reduce simultaneous
+conversations and cached-history budgets before starting. This conservative example keeps two
+8K llama.cpp slots while limiting each cached conversation to 4K tokens:
+
+```dotenv
+MUSE_SLOTS=2
+MUSE_CONTEXT_SIZE=16384
+MUSE_SESSION_TOKEN_LIMIT=4096
+MUSE_TOTAL_CACHE_TOKEN_LIMIT=8192
+MUSE_MAX_OUTPUT_TOKENS=1024
+```
+
+These values trade parallel chats, retained context, and maximum reply length for lower cache
+memory use; they do not shrink the model weights. Keep `MUSE_CONTEXT_SIZE / MUSE_SLOTS` at least
+as large as `MUSE_SESSION_TOKEN_LIMIT`, then run the configuration validation below.
 
 Validate without starting a model (uses configured file paths but does not load weights):
 
@@ -165,8 +252,19 @@ Rollback requires the Ollama app already installed. It restores its saved login 
 waits for `/api/tags`; it does not install Ollama or change models. For foreground debugging,
 `./scripts/run.sh` runs until Ctrl-C; stop the background service first to avoid a port conflict.
 
-For a phone, set `MUSE_HOST=0.0.0.0`, restart deliberately after any existing test finishes,
-and use `http://<Mac-Wi-Fi-IP>:11434` in the app. Find the address in macOS Network settings.
+Whether the GGUF files came directly from Meta or were already present, LearnChat's cache leases,
+dashboard, HTTP behavior, and mobile behavior are unchanged.
+
+For an optional phone connection, set `MUSE_HOST=0.0.0.0` in `.env`, then restart after any
+existing test finishes so launchd reads the new setting:
+
+```sh
+./scripts/stop.sh
+./scripts/start.sh
+```
+
+Find the laptop's address in macOS **System Settings > Wi-Fi > Details > IP Address**, then enter
+`http://<Mac-Wi-Fi-IP>:11434` and model `muse-glimmer:latest` in LearnChat's Settings screen.
 Do not use `0.0.0.0` or `localhost` as the phone's server address. Keep both devices on the same
 trusted network and avoid guest-network device isolation or router port forwarding.
 
