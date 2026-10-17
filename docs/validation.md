@@ -1,14 +1,34 @@
 # Validation record
 
+## LearnChat rebranding validation
+
+Checked on 2026-10-17 on the existing Apple silicon Mac without restarting the live inference
+service or changing its network exposure.
+
+| Check | Result |
+| --- | --- |
+| Case-insensitive retired-brand scan | Passed across all tracked filenames and file content, including binary-safe Git scanning |
+| Legacy/custom icon scan | Passed; tracked launcher and AppIcon artwork was removed, the Android APK contains no launcher asset, and the iOS product declares no icon key |
+| Runtime unit tests | 47 passed; 1 optional process-monitor test skipped because its extra dependency is not installed |
+| Dashboard JavaScript | Syntax and polling-race test passed |
+| Runtime shell scripts | zsh syntax checks passed; the launchd generator CLI loaded successfully |
+| Android | Debug APK assembled and 14 unit tests passed with JDK 22 |
+| iOS | Renamed XcodeGen project regenerated; simulator build and all 19 unit tests passed on iPhone 17 / iOS 26.5 |
+
+Build products remain in ignored local directories and are not publication inputs. The mobile
+projects intentionally omit custom launcher artwork and use their platform placeholders. Muse
+Glimmer remains the configured example model, and the repository must remain private through
+independent review and Kedar's approval.
+
 ## Imported source baseline
 
-This repository began as a clean snapshot of private QChat `main` revision
+This repository began as a clean snapshot of private LearnChat `main` revision
 `3ba550dff14e99e3fa3047778136fc4601895485`. The snapshot contains no source repository Git
 history. Local Orcha/configuration state, credentials, environments, model weights, caches,
 builds, logs and chat data were excluded from the publication inventory.
 
-The source still carries its pre-rebranding `QChat` names. LearnChat must remain private until
-the rebranding work, an independent publication audit and human approval are complete.
+The imported snapshot's pre-rebranding identifiers have now been replaced with LearnChat names.
+LearnChat must remain private until an independent publication audit and human approval are complete.
 
 Checked on 2026-10-17 on the existing Apple silicon Mac. Runtime and app folders stayed in
 place, and the live inference service was not restarted.
@@ -25,7 +45,7 @@ place, and the live inference service was not restarted.
 | Credential-pattern scan | No private keys or recognized token patterns in the reviewed candidate files |
 
 Android checks used the existing local SDK and build cache. iOS compiled into the ignored
-`build/` directory and ran only `QChatTests`; no live UI/device signing test was
+`build/` directory and ran only `LearnChatTests`; no live UI/device signing test was
 performed for this migration. Downloads and a clean-host model startup were documented and
 checked against upstream guidance, but not repeated: the 18 GB installed model and running
 service were preserved. API-key and post-reboot installation paths were not exercised.
@@ -34,15 +54,15 @@ The source project's earlier QA review covered its publication inventory, runtim
 iOS results, launchd generation and shell syntax. The current private-repository setup repeated
 47 runtime tests, the dashboard JavaScript and syntax checks, Android's debug build and 14 unit
 tests, all 19 iOS unit tests, the staged inventory review and a credential-pattern scan. These
-checks establish the imported baseline; they do not replace the independent LearnChat
-rebranding/publication audit or Kedar's repository and setup-guide verification.
+checks establish the imported baseline; they do not replace the independent publication audit or
+Kedar's repository and setup-guide verification.
 
 ## Reproduce the checks
 
 ```sh
 (cd muse-runtime && PYTHONPATH=. python3 -m unittest discover -s tests -v)
-(cd QChat && ./gradlew testDebugUnitTest assembleDebug)
-(cd QChat-iOS && xcodebuild build -project QChat.xcodeproj -scheme QChat \
+(cd LearnChat && ./gradlew testDebugUnitTest assembleDebug)
+(cd LearnChat-iOS && xcodebuild build -project LearnChat.xcodeproj -scheme LearnChat \
   -destination 'generic/platform=iOS Simulator' -derivedDataPath build CODE_SIGNING_ALLOWED=NO)
 ```
 

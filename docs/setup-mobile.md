@@ -12,10 +12,10 @@ platform 35, platform tools (`adb`) and accepted Android SDK licenses. This sour
 8.13, Android Gradle Plugin 8.13.1 and Kotlin 2.2.10. The app requires Android 8 / API 26 or newer
 and currently packages only **arm64-v8a** native libraries; use an arm64 phone/emulator.
 
-From the repository root (the Android folder is the inner `QChat/`):
+From the repository root (the Android folder is the inner `LearnChat/`):
 
 ```sh
-cd QChat
+cd LearnChat
 # macOS example: use an actually installed supported JDK. This host has JDK 22.
 export JAVA_HOME=$(/usr/libexec/java_home -v 22)
 # On another host choose your installed JDK 17-23 instead.
@@ -28,6 +28,8 @@ printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
 Studio can create it. SDK licenses must be accepted interactively if prompted; this repository
 does not auto-accept license agreements. Debug signing uses the developer's local debug key.
 Release/store signing and distribution are not configured.
+The repository intentionally contains no custom launcher artwork, so Android uses its unbranded
+platform placeholder icon.
 
 Enable Developer options and USB debugging on the phone, connect it, and approve its USB trust
 prompt. Then:
@@ -38,7 +40,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
 If multiple devices are listed, use `adb -s <device-serial> install -r ...` for the intended one.
-The debug application ID is `com.qchat.app.debug`. The APK is generated locally and excluded
+The debug application ID is `com.learnchat.app.debug`. The APK is generated locally and excluded
 from Git. Installation with `-r` preserves application data when the signing key is compatible;
 a different developer's debug key can cause a signature conflict. Do not uninstall to fix it
 without considering saved chat history.
@@ -55,15 +57,17 @@ Requirements: macOS, Xcode with an installed iOS Simulator runtime (validated he
 27 and iOS 26.5 Simulator), and iOS 17 or newer on a device. The app uses Apple frameworks only.
 The generated Xcode project is included; `project.yml` is its XcodeGen source. Install XcodeGen
 only if regenerating the project (`brew install xcodegen`, then `xcodegen generate` in
-`QChat-iOS`). Keep the specification and generated project consistent.
+`LearnChat-iOS`). Keep the specification and generated project consistent.
+The app icon catalog is intentionally absent, so simulator and development builds use Xcode's
+unbranded placeholder.
 
-Open `QChat-iOS/QChat.xcodeproj`, choose an available iPhone Simulator and Run. For a terminal
+Open `LearnChat-iOS/LearnChat.xcodeproj`, choose an available iPhone Simulator and Run. For a terminal
 build, first list destinations so you can substitute one installed on your Mac:
 
 ```sh
-cd QChat-iOS
-xcodebuild -showdestinations -project QChat.xcodeproj -scheme QChat
-xcodebuild build -project QChat.xcodeproj -scheme QChat \
+cd LearnChat-iOS
+xcodebuild -showdestinations -project LearnChat.xcodeproj -scheme LearnChat
+xcodebuild build -project LearnChat.xcodeproj -scheme LearnChat \
   -destination 'generic/platform=iOS Simulator' \
   -derivedDataPath build CODE_SIGNING_ALLOWED=NO
 ```
@@ -71,19 +75,19 @@ xcodebuild build -project QChat.xcodeproj -scheme QChat \
 After booting a Simulator through Xcode:
 
 ```sh
-xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/QChat.app
-xcrun simctl launch booted com.qchat.app
+xcrun simctl install booted build/Build/Products/Debug-iphonesimulator/LearnChat.app
+xcrun simctl launch booted com.learnchat.app
 ```
 
 Run the existing unit tests on an installed Simulator (the example is available on this host):
 
 ```sh
-xcodebuild test -project QChat.xcodeproj -scheme QChat \
+xcodebuild test -project LearnChat.xcodeproj -scheme LearnChat \
   -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
-  -derivedDataPath build CODE_SIGNING_ALLOWED=NO -only-testing:QChatTests
+  -derivedDataPath build CODE_SIGNING_ALLOWED=NO -only-testing:LearnChatTests
 ```
 
-Live UI tests in `QChatUITests` need a reachable runtime; the photo case also needs a picture in
+Live UI tests in `LearnChatUITests` need a reachable runtime; the photo case also needs a picture in
 the Simulator library. Running build/unit tests does not establish a real phone chat.
 
 For an iPhone, connect and trust the device, enable Developer Mode, select your development
@@ -104,9 +108,10 @@ foreground; the next send rebuilds a missing runtime session from the phone's sa
 The mobile transport implementation is named for the Muse Glimmer service, but its established
 HTTP contract is unchanged: `/api/chat`, `/api/tags`, session headers, newline-delimited chunks,
 and JSON keys such as `messages`, `images`, and `options.num_ctx` keep their existing wire names.
-The rename does not change Android's `qchat.db` schema or `qchat_settings` preference keys, nor the
-iOS SwiftData models or `UserDefaults` keys. Installing a compatible update therefore preserves
-existing settings and on-device chat history.
+The local storage names, SwiftData models and settings keys match the LearnChat identifiers.
+Installing over a compatible LearnChat build preserves its settings and on-device chat history.
+A package with a different bundle or application identifier installs separately and its data is
+not migrated automatically.
 
 ## Phone verification
 
@@ -115,7 +120,7 @@ For a new installation and the separate Android heartbeat acceptance, use these 
 physical phone and record the result in the relevant Orcha task:
 
 1. Connect Mac and phone to the same trusted Wi-Fi; ensure the Mac stays awake.
-2. Test the configured server connection, then send a short message in QChat.
+2. Test the configured server connection, then send a short message in LearnChat.
 3. Confirm visible text streams, finishes without an error, and remains after reopening the chat.
 4. On Android, leave that established chat open for over five minutes and send again. Background
    or leave the chat for over five minutes, return, and send again; local history should survive.

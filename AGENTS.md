@@ -4,7 +4,7 @@ Read this file and `docs/orcha-project-preferences.md` before working. Read the 
 Orcha task's full description, definition of done, protocol and thread on every wake.
 
 - This is one repository: `open-orcha/LearnChat`, private, default branch `main`.
-- Keep the existing paths: `muse-runtime/`, `QChat/` (Android), `QChat-iOS/`, `docs/`.
+- Keep the existing paths: `muse-runtime/`, `LearnChat/` (Android), `LearnChat-iOS/`, `docs/`.
   The running Mac service refers to this workspace; moving folders needs coordination.
 - Follow `docs/github-workflow.md` for reconciliation, review, attribution and publication.
   Before editing, inspect Git status and fetch the remote. Never discard, stash, commit or

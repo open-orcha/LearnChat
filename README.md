@@ -5,23 +5,21 @@ Muse Glimmer running on a Mac through standalone llama.cpp and a Python HTTP ser
 Chats are saved on the phone; the Mac manages short-lived conversation caches.
 Ollama is not required to run the current service.
 
-This private repository is the reviewed pre-rebranding source baseline. The existing
-`QChat` project, package and bundle names remain intact so the working apps and service are
-not disrupted. Keep the repository private until component rebranding, independent QA and
-human approval are complete.
+This private repository contains the LearnChat runtime, dashboard and mobile clients. Project,
+package and bundle names use LearnChat consistently. Keep the repository private until independent
+QA and human approval are complete.
 
 ## Repository layout
 
 | Folder | Contents |
 | --- | --- |
 | [`muse-runtime/`](muse-runtime/) | Python control service, cache management, macOS startup scripts and tests |
-| [`QChat/`](QChat/) | Kotlin / Jetpack Compose Android app, Gradle wrapper and Room schemas |
-| [`QChat-iOS/`](QChat-iOS/) | SwiftUI iOS app, Xcode project, XcodeGen specification and tests |
+| [`LearnChat/`](LearnChat/) | Kotlin / Jetpack Compose Android app, Gradle wrapper and Room schemas |
+| [`LearnChat-iOS/`](LearnChat-iOS/) | SwiftUI iOS app, Xcode project, XcodeGen specification and tests |
 | [`docs/`](docs/) | Setup, HTTP contract, troubleshooting, validation and GitHub workflow |
 
-The existing folder names are intentional: they preserve the working service and mobile
-projects. There are no submodules or nested repositories. Future runtime/model work belongs
-in this same repository, with component-specific changes reviewed together when necessary.
+There are no submodules or nested repositories. Future runtime/model work belongs in this same
+repository, with component-specific changes reviewed together when necessary.
 
 ## Start here
 

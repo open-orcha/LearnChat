@@ -1,7 +1,7 @@
 # Runtime HTTP contract
 
 All routes below are on the Python service, normally port 11434. The internal llama.cpp
-backend stays at `127.0.0.1:18080`. These are the public routes used by QChat and local operations.
+backend stays at `127.0.0.1:18080`. These are the public routes used by LearnChat and local operations.
 See [setup](setup-runtime.md) for configuration and [troubleshooting](troubleshooting.md) for
 common failures. When configured, protected calls require `Authorization: Bearer <key>`.
 

@@ -2,10 +2,10 @@
 
 The canonical repository is **https://github.com/open-orcha/LearnChat**, private, with
 `main` as the default and integration branch. The existing workspace root is the Git root;
-`muse-runtime`, `QChat`, `QChat-iOS` and `docs` remain in place. No prior component Git history
+`muse-runtime`, `LearnChat`, `LearnChat-iOS` and `docs` remain in place. No prior component Git history
 was present when this monorepo was initialized. The initial snapshot preserves existing source
 and build inputs; it does not publish the local Orcha conversation history. Keep the repository
-private until component rebranding, independent QA and human approval are complete.
+private through independent QA and human approval.
 
 ## Before making changes
 
@@ -27,7 +27,7 @@ Do not switch branches underneath a running service or another agent in the shar
 For independent work, use a separate worktree outside this workspace when appropriate:
 
 ```sh
-git worktree add -b task/short-description ../qchat-task origin/main
+git worktree add -b task/short-description ../learnchat-task origin/main
 ```
 
 A worktree has no local `.env`, models or SDK settings; supply local prerequisites deliberately.

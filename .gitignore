@@ -55,5 +55,3 @@ dist/
 .DS_Store
 # Legacy host-specific launchd registration; new registrations are generated in state/.
 /muse-runtime/scripts/local.muse-glimmer.runtime.plist
-# Original icon backup is not a build input.
-/QChat-iOS/tools/AppIcon-original-backup.png

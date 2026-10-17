@@ -1,7 +1,7 @@
 # Muse Glimmer managed runtime
 
 Standalone llama.cpp runs Muse Glimmer behind this Python standard-library service.
-The service provides the Ollama-compatible HTTP endpoints QChat uses, plus bounded
+The service provides the Ollama-compatible HTTP endpoints LearnChat uses, plus bounded
 conversation caches and renewable five-minute leases. Ollama is not a runtime dependency.
 
 - [Install and configure](../docs/setup-runtime.md)

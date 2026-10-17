@@ -40,7 +40,7 @@ function sessions() {
   const r=data?.runtime, container=$('sessions');container.replaceChildren();
   if(!r){$('slots').textContent='Waiting for runtime';container.append(node('p','No runtime sample yet.','empty'));return;}
   $('slots').textContent=`${r.active_leases} active leases • ${r.slots_busy} busy / ${r.slots_occupied} occupied / ${r.slots_free} free slots`;
-  if(!r.sessions.length) container.append(node('p',isLive()?'No conversation leases right now. A conversation will appear when you chat in QChat.':'No leases in the last known sample. Current state is unavailable.','empty'));
+  if(!r.sessions.length) container.append(node('p',isLive()?'No conversation leases right now. A conversation will appear when you chat in LearnChat.':'No leases in the last known sample. Current state is unavailable.','empty'));
   for(const s of r.sessions){
     const row=node('article',undefined,'lease'), identity=node('div'), timer=node('div'), renewal=node('div'), cache=node('div');
     identity.append(node('p',chat(s.session),'name'),node('p',s.in_flight?'Reply in progress':s.state==='awaiting_expiry'?'Awaiting expiry sweep':'Idle conversation','state'),node('p',`Cache ${s.slot===null?'evicted / no slot':`in slot ${s.slot+1}`} • ${s.cache_valid?'reusable':'rebuild needed'}`,'detail'));

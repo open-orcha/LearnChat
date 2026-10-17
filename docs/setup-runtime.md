@@ -43,7 +43,7 @@ upgrading rather than updating the live service during phone testing.
 Download the Q4_K_M text weights and matching perception encoder from
 [Meta's Muse Glimmer GGUF repository](https://huggingface.co/meta-models/Muse-Glimmer-30B-GGUF).
 The model card identifies the two files below and requires llama.cpp build 10353 or later.
-Read its model terms before use; no weights are distributed in QChat.
+Read its model terms before use; no weights are distributed in LearnChat.
 
 ```sh
 mkdir -p "$HOME/Models/muse-glimmer"
